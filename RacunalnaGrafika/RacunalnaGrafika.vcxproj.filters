@@ -28,4 +28,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\..\OneDrive\Desktop\Faks\4godina\rgrafika\lab2\triangle.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="..\..\..\..\OneDrive\Desktop\Faks\4godina\rgrafika\lab2\tetrahedron.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+  </ItemGroup>
 </Project>

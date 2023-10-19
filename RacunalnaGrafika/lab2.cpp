@@ -1,7 +1,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
+#include <string>
+#include <sstream>
 #include <iostream>
+#include <fstream>
+#include <vector>
 
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
@@ -23,8 +26,59 @@ const unsigned int HEIGHT = 600;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-int lab2(void)
+int read_obj() {
+    return 0;
+}
+
+int lab2(std::string file)
 {
+    //std::cout << file << std::endl;
+
+    //float vertices[] = {
+    //   -0.5f, -0.5f, 0.0f,
+    //    0.5f, -0.5f, 0.0f,
+    //    0.0f,  0.5f, 0.0f
+    //};
+
+    std::vector<float> verticesVec;
+
+    std::ifstream objFile(file);
+
+    if (!objFile.is_open()) {
+        std::cerr << "Failed to open the OBJ file." << std::endl;
+        exit(1);
+    }
+
+    std::string line;
+    while (std::getline(objFile, line)) {
+        std::cout << line << std::endl;
+        std::istringstream iss(line);
+        std::string token;
+        iss >> token;
+
+        if (token == "v") {
+            float x, y, z;
+            iss >> x >> y >> z;
+            std::cout << "v" << x << y << z << std::endl;
+            verticesVec.push_back(x);
+            verticesVec.push_back(y);
+            verticesVec.push_back(z);
+        }
+    }
+
+    int size = verticesVec.size();
+
+    //float* vertices = new float[size];
+    float vertices[9];
+
+    for (int i = 0; i < size; i++) {
+        vertices[i] = verticesVec[i];
+        std::cout << vertices[i] << std::endl;
+    }
+
+
+    objFile.close();
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -95,11 +149,7 @@ int lab2(void)
 
 
     // setup vertices, configure vertex attributes
-    float vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
-    };
+
 
     unsigned int VBO, VAO;
     glGenBuffers(1, &VBO);
@@ -134,6 +184,8 @@ int lab2(void)
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
 
+
+    //delete[] vertices;
 
     glfwTerminate();
 
