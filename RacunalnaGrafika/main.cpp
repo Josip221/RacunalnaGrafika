@@ -17,26 +17,19 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        std::cout << "Enter 3 vertices (e.g., 'v 0.5 0.2 0.5'): " << std::endl;
+        std::cout << "Enter vertices and faces (e.g., 'v 0.5 0.2 0.5', 'f 1 2 3'): " << std::endl;
 
         std::string input;
-
-        for (int i = 0; i < 3; i++) {
+        
+        while (true) {
             std::getline(std::cin, input);
 
-            if (input.length() > 2 && input[0] == 'v' && input[1] == ' ') {
-                objFile << input << '\n';
+            if (input == "exit") {
+                break;
             }
-            else {
-                std::cerr << "Invalid input for vertex. Expected 'v x y z' format." << std::endl;
-                return 1;
-            }
+
+            objFile << input << '\n';
         }
-
-        std::cout << "Enter 1 face (e.g., 'f 1 2 3'): " << std::endl;
-        std::getline(std::cin, input);
-        objFile << '\n' << input ;
-
 
         objFile.close();
     }
@@ -49,7 +42,7 @@ int main(int argc, char *argv[]) {
     // LAB 1
     //lab1();
 
-    // LAB 2
+    //LAB 2
     lab2(file);
 
     return 0;

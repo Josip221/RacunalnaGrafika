@@ -16,32 +16,19 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = vec4(1.0f, 1.0f, 0.0f, 1.0f);\n"
 "}\n\0";
 
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
-
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
-int read_obj() {
-    return 0;
-}
-
 int lab2(std::string file)
 {
-    //std::cout << file << std::endl;
-
-    //float vertices[] = {
-    //   -0.5f, -0.5f, 0.0f,
-    //    0.5f, -0.5f, 0.0f,
-    //    0.0f,  0.5f, 0.0f
-    //};
-
     std::vector<float> verticesVec;
-
+    std::vector<unsigned int> indicesVec;
     std::ifstream objFile(file);
 
     if (!objFile.is_open()) {
@@ -51,7 +38,6 @@ int lab2(std::string file)
 
     std::string line;
     while (std::getline(objFile, line)) {
-        std::cout << line << std::endl;
         std::istringstream iss(line);
         std::string token;
         iss >> token;
@@ -59,24 +45,19 @@ int lab2(std::string file)
         if (token == "v") {
             float x, y, z;
             iss >> x >> y >> z;
-            std::cout << "v" << x << y << z << std::endl;
             verticesVec.push_back(x);
             verticesVec.push_back(y);
             verticesVec.push_back(z);
         }
+
+        if (token == "f") {
+            unsigned int x, y, z;
+            iss >> x >> y >> z;
+            indicesVec.push_back(x);
+            indicesVec.push_back(y);
+            indicesVec.push_back(z);
+        }
     }
-
-    int size = verticesVec.size();
-
-    //float* vertices = new float[size];
-    float vertices[9];
-
-    for (int i = 0; i < size; i++) {
-        vertices[i] = verticesVec[i];
-        std::cout << vertices[i] << std::endl;
-    }
-
-
     objFile.close();
 
     glfwInit();
@@ -149,23 +130,31 @@ int lab2(std::string file)
 
 
     // setup vertices, configure vertex attributes
-
-
-    unsigned int VBO, VAO;
+    unsigned int VBO, VAO, EBO;
     glGenBuffers(1, &VBO);
     glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &EBO);
+
     glBindVertexArray(VAO);
 
+    // VBO BIND
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesVec), verticesVec.data(), GL_STATIC_DRAW);
+
+    // EBO BIND
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesVec), indicesVec.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
     glBindVertexArray(0);
 
+    // uncomment this call to draw in wireframe polygons.
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    std::cout << "Render start" << std::endl;
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -175,7 +164,8 @@ int lab2(std::string file)
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO); 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, indicesVec.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -184,8 +174,6 @@ int lab2(std::string file)
     glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
 
-
-    //delete[] vertices;
 
     glfwTerminate();
 
